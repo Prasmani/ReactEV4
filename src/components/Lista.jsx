@@ -13,7 +13,7 @@ function List({ items, editItem, deleteItem, calcularApreciacion }) {
       <ul className="alumnos-list">
         {items.map(({ id, nombre, materia, promedio }) => (
           <li key={id} className="alumno-item">
-            <h3>{nombre}</h3>
+            <h3><strong>Nombre:</strong> {nombre}</h3>
             <p><strong>Materia:</strong> {materia}</p>
             <p><strong>Promedio:</strong> <span className={getColor(promedio)}>{promedio.toFixed(1)}</span></p>
             <p><strong>Apreciación:</strong> <span className={getColor(promedio)}>{calcularApreciacion(promedio)}</span></p>
