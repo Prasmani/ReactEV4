@@ -1,28 +1,29 @@
-// Componente funcional llamado 'List' que recibe tres props:
-// - items: arreglo de objetos con al menos id y value
-// - editItem: función para editar un ítem
-// - deleteItem: función para eliminar un ítem
-function List({ items, editItem, deleteItem }) {
+import '../css_de_componentes/Lista.css';
+function List({ items, editItem, deleteItem, calcularApreciacion }) {
+    const getColor = (p) => {
+      if (p >= 6.5) return 'destacado';
+      if (p >= 5.6) return 'buen-trabajo';
+      if (p >= 4.0) return 'con-mejora';
+      return 'deficiente';
+    };
+  
+    if (!items.length) return <p>No hay alumnos registrados.</p>;
+  
     return (
-        // Renderiza una lista sin orden (<ul>)
-        <ul>
-            {/* Itera sobre cada elemento del arreglo 'items' */}
-            {items.map((item) => (
-                // Cada <li> necesita una key única, aquí usamos item.id
-                <li key={item.id}>
-                    {/* Muestra el valor del ítem */}
-                    {item.value}
-
-                    {/* Botón que ejecuta la función 'editItem' pasando el objeto completo */}
-                    <button onClick={() => editItem(item)}>Editar</button>
-
-                    {/* Botón que ejecuta 'deleteItem' pasando solo el id del ítem */}
-                    <button onClick={() => deleteItem(item.id)}>Eliminar</button>
-                </li>
-            ))}
-        </ul>
+      <ul className="alumnos-list">
+        {items.map(({ id, nombre, materia, promedio }) => (
+          <li key={id} className="alumno-item">
+            <h3>{nombre}</h3>
+            <p><strong>Materia:</strong> {materia}</p>
+            <p><strong>Promedio:</strong> <span className={getColor(promedio)}>{promedio.toFixed(1)}</span></p>
+            <p><strong>Apreciación:</strong> <span className={getColor(promedio)}>{calcularApreciacion(promedio)}</span></p>
+            <button onClick={() => editItem({ id, nombre, materia, promedio })}>Editar</button>
+            <button onClick={() => deleteItem(id)}>Eliminar</button>
+          </li>
+        ))}
+      </ul>
     );
-}
-
-// Exporta el componente para poder usarlo en otros archivos
-export default List;
+  }
+  
+  export default List;
+  

@@ -1,48 +1,55 @@
-// Importa los hooks de React: useState para el estado y useEffect para efectos secundarios
 import { useState, useEffect } from 'react';
+import '../css_de_componentes/Form.css';
 
-// Componente funcional 'Form' que recibe dos props:
-// - addOrUpdateItem: función para agregar o actualizar un ítem
-// - itemToEdit: ítem que se quiere editar (si existe)
 function Form({ addOrUpdateItem, itemToEdit }) {
-    // Estado para guardar el texto ingresado en el input
-    const [inputValue, setInputValue] = useState('');
+  const [data, setData] = useState({ nombre: '', materia: '', promedio: '' });
+  const [error, setError] = useState('');
 
-    // useEffect se ejecuta cuando cambia 'itemToEdit'
-    useEffect(() => {
-        if (itemToEdit) {
-            // Si hay un ítem para editar, se carga su valor en el input
-            setInputValue(itemToEdit.value);
-        } else {
-            // Si no hay ítem para editar, se limpia el input
-            setInputValue('');
-        }
-    }, [itemToEdit]);
+  useEffect(() => {
+    if (itemToEdit) {
+      setData({
+        nombre: itemToEdit.nombre,
+        materia: itemToEdit.materia,
+        promedio: itemToEdit.promedio.toString()
+      });
+    } else {
+      setData({ nombre: '', materia: '', promedio: '' });
+    }
+    setError('');
+  }, [itemToEdit]);
 
-    // Función que se ejecuta al enviar el formulario
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Evita recargar la página
-        addOrUpdateItem(inputValue); // Llama a la función que agrega o actualiza
-        setInputValue(''); // Limpia el input después de enviar
-    };
+  const handleChange = e => setData({ ...data, [e.target.name]: e.target.value });
 
-    return (
-        // Formulario con función handleSubmit al enviar
-        <form onSubmit={handleSubmit}>
-            {/* Campo de texto controlado */}
-            <input
-                type="text"
-                placeholder="Ingrese texto"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)} // Actualiza el estado al escribir
-            />
-            {/* Botón que cambia de texto si estamos editando o agregando */}
-            <button type="submit">
-                {itemToEdit ? 'Actualizar' : 'Agregar'}
-            </button>
-        </form>
-    )
+  const validar = () => {
+    if (!data.nombre.trim()) return setError('Nombre requerido'), false;
+    if (!data.materia.trim()) return setError('Materia requerida'), false;
+    const promedio = parseFloat(data.promedio);
+    if (isNaN(promedio) || promedio < 1 || promedio > 7)
+      return setError('Promedio debe estar entre 1 y 7'), false;
+    return setError(''), true;
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    if (!validar()) return;
+    addOrUpdateItem({
+      nombre: data.nombre.trim(),
+      materia: data.materia.trim(),
+      promedio: parseFloat(data.promedio)
+    });
+    if (!itemToEdit) setData({ nombre: '', materia: '', promedio: '' });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="form-container">
+      <h2>{itemToEdit ? 'Editar' : 'Agregar'} Alumno</h2>
+      {error && <div className="error-message">{error}</div>}
+      <input type="text" name="nombre" placeholder="Nombre" value={data.nombre} onChange={handleChange} />
+      <input type="text" name="materia" placeholder="Materia" value={data.materia} onChange={handleChange} />
+      <input type="number" name="promedio" placeholder="Promedio" value={data.promedio} onChange={handleChange} min="1" max="7" step="0.1" />
+      <button type="submit">{itemToEdit ? 'Actualizar' : 'Agregar'}</button>
+    </form>
+  );
 }
 
-// Exporta el componente para poder usarlo en otros archivos
 export default Form;
